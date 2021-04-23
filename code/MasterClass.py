@@ -24,7 +24,7 @@ IN THE SOFTWARE.
 
 from sys import argv
 from pathlib import Path
-from tinytag import TinyTag
+from tinytag import TinyTag, TinyTagException
 
 __author__ = "Matthew DeTrana"
 __license__ = "MIT"
@@ -33,17 +33,40 @@ __email__ = "detranam.code@gmail.com"
 __status__ = "Development"
 
 music_dict = {}
-def list_files(search_path):
-  onlyfiles = []
+# Populate this 'youtube playlist links' list to whatever
+# playlists you want to download all songs from.
+youtube_playlist_links = []
+
+def populate_music_dict(search_path):
   for path in Path(search_path).rglob('*.*'):
     music_dict[path] = TinyTag.get(path)
-    onlyfiles.append(path)
-  print("printing files")
-  print(onlyfiles)
+  print("Print dictionary:")
   print(music_dict)
 
+def ensure_no_same_songs():
+  if len(music_dict) == 0:
+    print("ERROR: No values in the song dictionary.")
+    return
+  
+  # TODO: find an efficient algorithm to go through and check
+  # to see if a song is unique via tag.size (in bytes).
+
+  # I'm thinking start at the beginning then compare each item
+  # to all following values, then creating a list of 'conflicts',
+  # which are just the same size song.
+
+  # I'd also like to ensure no same-name songs, that's a problem
+  # for future me, though.
+
+def download_new_songs():
+
+    
+
 if __name__ == "__main__":
-  #try:
-  list_files(argv[1])
- # except:
- #   print("ERROR: Invalid or missing path!")
+  try:
+    populate_music_dict(argv[1])
+  except TinyTagException as err:
+    print("ERROR: TinyTag threw an error: " + err)
+
+
+
