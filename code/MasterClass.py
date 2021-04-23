@@ -20,12 +20,29 @@ Copyright 2019 Matthew DeTrana
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import classes
+#from multiprocessing.dummy import Pool as ThreadPool
+
+#from os import listdir
+#from os.path import isfile, join
+from sys import argv
+#from glob import glob
+from pathlib import Path
 
 __author__ = "Matthew DeTrana"
 __license__ = "Apache 2.0"
-__credits__ = ["Matthew DeTrana"]
 __version__ = "1.0.1"
-__maintainer__ = "Matthew DeTrana"
 __email__ = "detranam.code@gmail.com"
 __status__ = "Development"
+
+_path_to_search = "search_me"
+
+def list_files(search_path):
+  onlyfiles = []
+  for path in Path(search_path).rglob('*.*'):
+    onlyfiles.append(path)
+  print("printing files")
+  print(onlyfiles)
+
+if __name__ == "__main__":
+  print("calling main")
+  list_files(argv[1])
