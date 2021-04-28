@@ -25,6 +25,7 @@ IN THE SOFTWARE.
 from sys import argv
 from pathlib import Path
 from tinytag import TinyTag, TinyTagException
+from subprocess import run
 
 __author__ = "Matthew DeTrana"
 __license__ = "MIT"
@@ -59,7 +60,11 @@ def ensure_no_same_songs():
   # for future me, though.
 
 def download_new_songs():
+  print("downloading")
+  for playlist_link in youtube_playlist_links:
+    run(["youtube-dl", playlist_link,"--default-search" "gsearch" "-x" "--audio-format mp3" "--min-views" "1500" "--geo-bypass" "-i" "--embed-thumbnail"])
 
+    
     
 
 if __name__ == "__main__":
