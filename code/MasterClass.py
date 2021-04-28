@@ -16,8 +16,8 @@ and/or sell copies of the Software, and to permit persons to whom the Software i
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
@@ -27,6 +27,7 @@ from pathlib import Path
 from tinytag import TinyTag, TinyTagException
 from subprocess import run
 import os
+import shutil
 
 __author__ = "Matthew DeTrana"
 __license__ = "MIT"
@@ -41,8 +42,6 @@ youtube_playlist_links = []
 
 
 def populate_music_dict(search_path):
-    for path in Path(search_path).rglob('*.*'):
-        music_dict[path] = TinyTag.get(path)
     print("Print dictionary:")
     print(music_dict)
 
@@ -63,23 +62,41 @@ def ensure_no_same_songs():
     # for future me, though.
 
 
+def move_mp3_to_output():
+  create_dir("songs_moved")
+  mp3_paths = []
+  for path in Path("./").rglob('*.mp3'):
+      mp3_paths.append(path)
+  for individual_path in mp3_paths:
+      copylocation = os.path.join("\songs_moved\\", os.path.basename(individual_path))
+      currentlocation = os.path.join("\\", individual_path)
+      print(individual_path)
+      shutil.move(individual_path, copylocation)
+
+
+def create_dir(newdir):
+  try:
+        os.mkdir(newdir)
+        print(f"Creating directory '{newdir}'!")
+  except FileExistsError:
+        print(f"Directory '{newdir}' already exists!")
+
 def download_new_songs():
     print("Downloading songs")
 
-    try:
-        os.mkdir("song_output")
-        print("Creating directory 'song_output'!")
-    except FileExistsError:
-        print("Directory 'song_putput' already exists!")
+    create_dir("songs_out")
 
     for playlist_link in youtube_playlist_links:
         run(["youtube-dl", playlist_link, "--restrict-filenames",
-            "--default-search" "gsearch" "-x" "--audio-format mp3" "--min-views" "1500" "--geo-bypass" "-i" "--embed-thumbnail"])
+            "--default-search", "gsearch", "-x", "--audio-format",
+             "mp3", "--min-views", "1500", "--geo-bypass", "-i",
+             "--embed-thumbnail", "ffmpeg-location", "..\dependencies"])
 
 
 if __name__ == "__main__":
     try:
-        download_new_songs()
+        move_mp3_to_output()
+        # download_new_songs()
         # populate_music_dict(argv[1])
     except TinyTagException as err:
         print("ERROR: TinyTag threw an error: " + err)
