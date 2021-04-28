@@ -26,6 +26,7 @@ from sys import argv
 from pathlib import Path
 from tinytag import TinyTag, TinyTagException
 from subprocess import run
+import os
 
 __author__ = "Matthew DeTrana"
 __license__ = "MIT"
@@ -38,40 +39,47 @@ music_dict = {}
 # playlists you want to download all songs from.
 youtube_playlist_links = []
 
+
 def populate_music_dict(search_path):
-  for path in Path(search_path).rglob('*.*'):
-    music_dict[path] = TinyTag.get(path)
-  print("Print dictionary:")
-  print(music_dict)
+    for path in Path(search_path).rglob('*.*'):
+        music_dict[path] = TinyTag.get(path)
+    print("Print dictionary:")
+    print(music_dict)
+
 
 def ensure_no_same_songs():
-  if len(music_dict) == 0:
-    print("ERROR: No values in the song dictionary.")
-    return
-  
-  # TODO: find an efficient algorithm to go through and check
-  # to see if a song is unique via tag.size (in bytes).
+    if len(music_dict) == 0:
+        print("ERROR: No values in the song dictionary.")
+        return
 
-  # I'm thinking start at the beginning then compare each item
-  # to all following values, then creating a list of 'conflicts',
-  # which are just the same size song.
+    # TODO: find an efficient algorithm to go through and check
+    # to see if a song is unique via tag.size (in bytes).
 
-  # I'd also like to ensure no same-name songs, that's a problem
-  # for future me, though.
+    # I'm thinking start at the beginning then compare each item
+    # to all following values, then creating a list of 'conflicts',
+    # which are just the same size song.
+
+    # I'd also like to ensure no same-name songs, that's a problem
+    # for future me, though.
+
 
 def download_new_songs():
-  print("downloading")
-  for playlist_link in youtube_playlist_links:
-    run(["youtube-dl", playlist_link,"--default-search" "gsearch" "-x" "--audio-format mp3" "--min-views" "1500" "--geo-bypass" "-i" "--embed-thumbnail"])
+    print("Downloading songs")
 
-    
-    
+    try:
+        os.mkdir("song_output")
+        print("Creating directory 'song_output'!")
+    except FileExistsError:
+        print("Directory 'song_putput' already exists!")
+
+    for playlist_link in youtube_playlist_links:
+        run(["youtube-dl", playlist_link, "--restrict-filenames",
+            "--default-search" "gsearch" "-x" "--audio-format mp3" "--min-views" "1500" "--geo-bypass" "-i" "--embed-thumbnail"])
+
 
 if __name__ == "__main__":
-  try:
-    populate_music_dict(argv[1])
-  except TinyTagException as err:
-    print("ERROR: TinyTag threw an error: " + err)
-
-
-
+    try:
+        download_new_songs()
+        # populate_music_dict(argv[1])
+    except TinyTagException as err:
+        print("ERROR: TinyTag threw an error: " + err)
