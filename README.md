@@ -4,7 +4,7 @@ This app expects you to have the correct youtube-dl installed along with the nec
 
 # TODO
 - [ ] Allow input of a text file to search and download
-- [ ] Allow multiple youtube playlist links
+- [ ] Allow multiple youtube playlist links to download
 - [ ] Some sort of tracking system to know what has already been downloaded or not
 - [ ] Potentially a precision size checker to find what songs are identical and remove duplicates
 - [ ] Multithreading (if useful)

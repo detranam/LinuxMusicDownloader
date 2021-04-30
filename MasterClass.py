@@ -40,6 +40,10 @@ music_dict = {}
 # playlists you want to download all songs from.
 youtube_playlist_links = []
 
+# This is the location of which to move files downloaded into the current
+# directory
+final_destination = "songs_moved"
+
 
 def populate_music_dict(search_path):
     print("Print dictionary:")
@@ -63,15 +67,10 @@ def ensure_no_same_songs():
 
 
 def move_mp3_to_output():
-  create_dir("songs_moved")
+  create_dir(final_destination)
   mp3_paths = []
   for path in Path("./").rglob('*.mp3'):
-      mp3_paths.append(path)
-  for individual_path in mp3_paths:
-      copylocation = os.path.join("\songs_moved\\", os.path.basename(individual_path))
-      currentlocation = os.path.join("\\", individual_path)
-      print(individual_path)
-      shutil.move(individual_path, copylocation)
+      shutil.move(path, final_destination)
 
 
 def create_dir(newdir):
@@ -81,21 +80,29 @@ def create_dir(newdir):
   except FileExistsError:
         print(f"Directory '{newdir}' already exists!")
 
-def download_new_songs():
-    print("Downloading songs")
+def download_playlist_songs():
+    print("Downloading playlist songs")
 
     create_dir("songs_out")
 
     for playlist_link in youtube_playlist_links:
-        run(["youtube-dl", playlist_link, "--restrict-filenames",
+        run(["youtube-dl.exe", playlist_link, "--restrict-filenames",
             "--default-search", "gsearch", "-x", "--audio-format",
-             "mp3", "--min-views", "1500", "--geo-bypass", "-i",
-             "--embed-thumbnail", "ffmpeg-location", "..\dependencies"])
+             "mp3", "--geo-bypass", "-i", "--embed-thumbnail"])
 
+def download_txt_songs():
+    #this will eventually be passing in a *.txt file and searching for
+    #each line-item song
+    pass
+    run(["youtube-dl.exe", song_title, "--restrict-filenames",
+                "--default-search", "gsearch", "-x", "--audio-format",
+                "mp3", "--min-views", "1500", "--geo-bypass", "-i",
+                "--embed-thumbnail"])
 
 if __name__ == "__main__":
     try:
-        move_mp3_to_output()
+        download_playlist_songs()
+        # move_mp3_to_output()
         # download_new_songs()
         # populate_music_dict(argv[1])
     except TinyTagException as err:
