@@ -38,11 +38,12 @@ __status__ = "Development"
 music_dict = {}
 # Populate this 'youtube playlist links' list to whatever
 # playlists you want to download all songs from.
-youtube_playlist_links = ["https://www.youtube.com/playlist?list=PLRfY4Rc-GWzhdCvSPR7aTV0PJjjiSAGMs"]
+youtube_playlist_links = [
+    "https://www.youtube.com/playlist?list=PLRfY4Rc-GWzhdCvSPR7aTV0PJjjiSAGMs"]
 
 # This is the location of which to move files downloaded into the current
 # directory
-final_destination = "songs_moved"
+final_destination = "songs_out"
 
 
 def populate_music_dict(search_path):
@@ -67,37 +68,38 @@ def ensure_no_same_songs():
 
 
 def move_mp3_to_output():
-  create_dir(final_destination)
-  mp3_paths = []
-  for path in Path("./").rglob('*.mp3'):
-      shutil.move(path, final_destination)
+    create_dir(final_destination)
+    for path in Path("./").rglob('*.mp3'):
+        shutil.move(path, final_destination)
 
 
 def create_dir(newdir):
-  try:
+    try:
         os.mkdir(newdir)
         print(f"Creating directory '{newdir}'!")
-  except FileExistsError:
+    except FileExistsError:
         print(f"Directory '{newdir}' already exists!")
+
 
 def download_playlist_songs():
     print("Downloading playlist songs")
-
-    create_dir("songs_out")
-
     for playlist_link in youtube_playlist_links:
         run(["youtube-dlc", playlist_link, "--restrict-filenames",
             "--default-search", "gsearch", "-x", "--audio-format",
              "mp3", "--geo-bypass", "-i", "--embed-thumbnail"])
+    move_mp3_to_output()
+
 
 def download_txt_songs():
-    #this will eventually be passing in a *.txt file and searching for
-    #each line-item song
+    # this will eventually be passing in a *.txt file and searching for
+    # each line-item song
     pass
-    run(["youtube-dl.exe", song_title, "--restrict-filenames",
-                "--default-search", "gsearch", "-x", "--audio-format",
-                "mp3", "--min-views", "1500", "--geo-bypass", "-i",
+    run(["youtube-dlc", song_title, "--restrict-filenames",
+         "--default-search", "gsearch", "-x", "--audio-format",
+         "mp3", "--min-views", "1500", "--geo-bypass", "-i",
                 "--embed-thumbnail"])
+    move_mp3_to_output()
+
 
 if __name__ == "__main__":
     try:
