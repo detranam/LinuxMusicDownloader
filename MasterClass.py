@@ -86,7 +86,7 @@ def download_playlist_songs():
     create_dir("songs_out")
 
     for playlist_link in youtube_playlist_links:
-        run(["youtube-dl.exe", playlist_link, "--restrict-filenames",
+        run(["youtube-dlc", playlist_link, "--restrict-filenames",
             "--default-search", "gsearch", "-x", "--audio-format",
              "mp3", "--geo-bypass", "-i", "--embed-thumbnail"])
 
