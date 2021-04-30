@@ -38,7 +38,7 @@ __status__ = "Development"
 music_dict = {}
 # Populate this 'youtube playlist links' list to whatever
 # playlists you want to download all songs from.
-youtube_playlist_links = []
+youtube_playlist_links = ["https://www.youtube.com/playlist?list=PLRfY4Rc-GWzhdCvSPR7aTV0PJjjiSAGMs"]
 
 # This is the location of which to move files downloaded into the current
 # directory
