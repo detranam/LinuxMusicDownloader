@@ -35,6 +35,8 @@ __version__ = "1.0.1"
 __email__ = "detranam.code@gmail.com"
 __status__ = "Development"
 
+# python -m pip install git+https://github.com/blackjack4494/yt-dlc
+
 music_dict = {}
 # Populate this 'youtube playlist links' list to whatever
 # playlists you want to download all songs from.
