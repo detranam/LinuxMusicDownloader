@@ -1,4 +1,4 @@
-from sys import argv
+from sys import argv, platform
 from pathlib import Path
 from tinytag import TinyTag, TinyTagException
 from subprocess import run
@@ -57,18 +57,26 @@ def create_dir(newdir):
 def download_playlist_songs():
     print("Downloading playlist songs")
     for playlist_link in youtube_playlist_links:
-        run(["youtube-dlc", playlist_link, "--restrict-filenames",
+        run([oscmd(), playlist_link, "--restrict-filenames",
             "--default-search", "gsearch", "-x", "--audio-format",
              "mp3", "--geo-bypass", "-i", "--embed-thumbnail"])
-    move_mp3_to_output()
 
 
 def download_txt_songs(filename):
     # this will eventually be passing in a *.txt file and searching for
     # each line-item song
-    pass
-    run(["youtube-dlc", song_title, "--restrict-filenames",
+    with open(filename,'r') as songlist:
+        run([oscmd(), songlist.readline(), "--restrict-filenames",
          "--default-search", "gsearch", "-x", "--audio-format",
          "mp3", "--min-views", "1500", "--geo-bypass", "-i",
                 "--embed-thumbnail"])
-    move_mp3_to_output()
+
+
+def oscmd():
+    currentos = platform.system();
+    if currentos == "Linux":
+        return "youtube-dlc"
+    elif currentos == "Windows":
+        return "youtube-dl.exe"
+    else:
+        raise Exception("Current OS is neither Windows nor Linux")
