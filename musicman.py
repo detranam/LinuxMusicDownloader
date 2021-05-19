@@ -19,16 +19,26 @@ if __name__ == "__main__":
     print("ERROR: Cannot run musicman alone!")
 
 
-def populate_music_dict(search_path):
+def _populate_music_dict(search_path):
     print("Print dictionary:")
     print(music_dict)
+    for path in Path("./").rglob('*.mp3'):
+        song_size = os.path.getsize(path)
+        if music_dict[song_size] is not None:
+            music_dict[song_size] = path
+        else:
+            print(f"Warning! Found path \n{path} \nhas the same size ({song_size} bytes) as previously found path \n{music_dict[song_size]}")
+            print("Thus, skipping newly found song!")
+        
 
 
 def ensure_no_same_songs():
+    _populate_music_dict()
     if len(music_dict) == 0:
         print("ERROR: No values in the song dictionary.")
         return
 
+    
     # TODO: find an efficient algorithm to go through and check
     # to see if a song is unique via tag.size (in bytes).
 
