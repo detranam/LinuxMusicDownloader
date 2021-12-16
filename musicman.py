@@ -74,12 +74,33 @@ def download_playlist_songs(json_name):
         playlists = json.load(json_file)['playlists']
         for playlist in playlists:
             print(f"Downloading songs from {playlist}")
-            run([oscmd(), playlist, "--restrict-filenames",
-                "--default-search", "gvsearch1", "-x", "--audio-format",
-                 "mp3", "--geo-bypass", "-i", "--embed-thumbnail",
-                 "-o "])
+            YDL_OPTIONS = {
+                'format': 'bestaudio',
+                'geo_bypass': True,
+                'restrictfilenames': True,
+                'ignoreerrors': True,
+                'min_views': 1500,
+                'default_search': 'ytsearch',
+                'ffmpeg_location': 'C:\\ffmpeg\\bin',
+                'playlist_random': True,
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                },
+                    {
+                    'key': 'FFmpegMetadata'
+                }],
+                'outtmpl': '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'
+            }
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                ydl.download(playlist)
+            # run([oscmd(), playlist, "--restrict-filenames",
+            #     "--default-search", "gvsearch1", "-x", "--audio-format",
+            #      "mp3", "--geo-bypass", "-i", "--embed-thumbnail",
+            #      "-o "])
 
-#            'outtmpl': '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'
+#            
 
 
 def download_txt_songs(filename):
