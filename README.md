@@ -12,3 +12,7 @@ This app expects you to have the correct youtube-dl installed along with the nec
 - [ ] Some sort of tracking system to know what has already been downloaded or not
 - [ ] Potentially a precision size checker to find what songs are identical and remove duplicates
 - [ ] Multithreading (if useful)
+
+# How To Use
+
+Currently there's a few options on how to use this.

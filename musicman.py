@@ -10,11 +10,6 @@ from yt_dlp import YoutubeDL
 
 music_dict = {}
 
-# Populate this 'youtube playlist links' list to whatever
-# playlists you want to download all songs from.
-youtube_playlist_links = [
-    "https://www.youtube.com/playlist?list=PLRfY4Rc-GWzhdCvSPR7aTV0PJjjiSAGMs"]
-
 # This is the location of which to move files downloaded into the current
 # directory
 final_destination = "songs_out"
@@ -95,12 +90,38 @@ def download_playlist_songs(json_name):
             }
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 ydl.download(playlist)
-            # run([oscmd(), playlist, "--restrict-filenames",
-            #     "--default-search", "gvsearch1", "-x", "--audio-format",
-            #      "mp3", "--geo-bypass", "-i", "--embed-thumbnail",
-            #      "-o "])
 
-#            
+
+def download_playlist_links(path, link_array):
+    """Downloads music from an array into a given path
+
+    Args:
+        path (path): The place to 'dump' the files when downloaded
+        link_array (string[]): The playlist links to download from
+    """
+    for playlist in link_array:
+        print(f"Downloading songs from {playlist}")
+        YDL_OPTIONS = {
+            'format': 'bestaudio',
+            'geo_bypass': True,
+            'restrictfilenames': True,
+            'ignoreerrors': True,
+            'min_views': 1500,
+            'default_search': 'ytsearch',
+            'ffmpeg_location': 'C:\\ffmpeg\\bin',
+            'playlist_random': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            },
+                {
+                'key': 'FFmpegMetadata'
+            }],
+            'outtmpl': f'{path}'+'%(title)s.%(ext)s'
+        }
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            ydl.download(playlist)
 
 
 def download_txt_songs(filename):

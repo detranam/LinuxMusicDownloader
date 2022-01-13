@@ -38,19 +38,15 @@ __status__ = "Development"
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-m", "--move", help="Whether or not to move any downloaded songs to a 'songs_out' folder")
-# parser.add_argument("-p", "--playlist",
-#                     action="store_true", help="simply a test")
 group = parser.add_mutually_exclusive_group()
 group.add_argument(
     "-t", "--text", help="Whether or not to download from a provided text file line-by-line", type=str)
 group.add_argument(
-    "-j", "--json", help="Whether or not to download from the stored playlists", type=str)
+    "-j", "--json", help="The JSON file containing playlist link(s) to download from", type=str)
 args = parser.parse_args()
 try:
     if args.text:
         musicman.download_txt_songs(args.text.strip())
-    # elif args.playlist:
-    #     musicman.download_playlist_songs()
     elif args.json:
         musicman.download_playlist_songs(args.json)
 except TinyTagException as err:
