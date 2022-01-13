@@ -118,7 +118,7 @@ def download_playlist_links(path, link_array):
                 {
                 'key': 'FFmpegMetadata'
             }],
-            'outtmpl': f'{path}\\'+'%(title)s.%(ext)s'
+            'outtmpl': f'{path}\\'+'%(playlist_id)s\\%(title)s.%(ext)s'
         }
         with YoutubeDL(YDL_OPTIONS) as ydl:
             ydl.download(playlist)
