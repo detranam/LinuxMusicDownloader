@@ -92,6 +92,41 @@ def download_playlist_songs(json_name):
                 ydl.download(playlist)
 
 
+def get_new_songs_to_dl(playlist_link, already_downloaded_list):
+    output = run(f"yt-dlp.exe -s {playlist_link}", capture_output=True).stdout.decode('utf-8')
+    splitlines = output.split("\n")
+    useful_lines = []
+    playlist_id = ""
+    for line in splitlines:
+        if line.find('[youtube:tab]') != -1:
+            if line.find('Downloading webpage') != -1:
+                #'[youtube:tab] PLmi9g6uwZPL-kvPX9aJhMEpGM_KHcgjSX: Downloading webpage'
+                playlist_id = (line.replace("[youtube:tab] ", "")).replace(": Downloading webpage","")
+                continue
+            continue
+        if line.find('Downloading video') != -1:
+            continue
+        if line.find('youtube:tab') != -1:
+            continue
+        if line.find('Downloading webpage') != -1:
+            useful_lines.append(line)
+
+    # at this point, useful_lines should only have what we want in it
+    cleaned_useful_lines = []
+    for line in useful_lines:
+        cleaned_useful_lines.append((line.replace("[youtube] ", "")).replace(": Downloading webpage",""))
+    #now we find all the unique codes in cleaned_useful_lines that are not in already_downloaded_list, and return it with the playlist ID
+
+    new_song_ids = []
+    for code in cleaned_useful_lines:
+        if code in already_downloaded_list:
+            continue
+        new_song_ids.append(code)
+
+
+    return new_song_ids,playlist_id
+    
+
 def download_playlist_links(path, link_array):
     """Downloads music from an array into a given path
 
@@ -99,30 +134,43 @@ def download_playlist_links(path, link_array):
         path (path): The place to 'dump' the files when downloaded
         link_array (string[]): The playlist links to download from
     """
-    for playlist in link_array:
-        print(f"Downloading songs from {playlist}")
-        YDL_OPTIONS = {
-            'format': 'bestaudio',
-            'geo_bypass': True,
-            'restrictfilenames': True,
-            'ignoreerrors': True,
-            'min_views': 1500,
-            'default_search': 'ytsearch',
-            'ffmpeg_location': 'C:\\ffmpeg\\bin',
-            'playlist_random': True,
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            },
-                {
-                'key': 'FFmpegMetadata'
-            }],
-            'outtmpl': f'{path}\\'+'%(playlist_id)s\\%(title)s.%(ext)s'
-        }
-        with YoutubeDL(YDL_OPTIONS) as ydl:
-            ydl.download(playlist)
 
+    ret_dict = {}
+    for playlist in link_array:
+        already_dld_songs = link_array[playlist].split(',')
+        playlist_link = playlist
+        individual_new_songs_to_dl, playlist_id = get_new_songs_to_dl(playlist_link, already_dld_songs)
+        if len(individual_new_songs_to_dl) == 0:
+            print(f"No new songs to download for playlist link {playlist}")
+            continue
+        print(f"Downloading {len(individual_new_songs_to_dl)} new songs from {playlist_link}")
+        for code in individual_new_songs_to_dl:
+            YDL_OPTIONS = {
+                'format': 'bestaudio',
+                'geo_bypass': True,
+                'restrictfilenames': True,
+                'ignoreerrors': True,
+                'min_views': 1500,
+                'default_search': 'ytsearch',
+                'ffmpeg_location': 'C:\\ffmpeg\\bin',
+                'playlist_random': True,
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                },
+                    {
+                    'key': 'FFmpegMetadata'
+                }],
+                'outtmpl': f'{path}\\'+ f"{playlist_id}\\"  +'%(title)s.%(ext)s'
+            }
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                ydl.download("https://www.youtube.com/watch?v=" + code)#playlist_link)
+        #now that we've downloaded all the codes, we should update the playlist link by appending all the new song codes we just downloaded
+        updated_codes = ','.join(already_dld_songs + individual_new_songs_to_dl)
+        ret_dict[playlist_link] = updated_codes
+    #now that we finished downloading all our songs, return the new and edited link_array in order for state to be saved.
+    return ret_dict
 
 def download_txt_songs(filename):
     # this will eventually be passing in a *.txt file and searching for
