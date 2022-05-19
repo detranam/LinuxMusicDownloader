@@ -136,8 +136,8 @@ def download_playlist_links(path, link_array):
 
     ret_dict = {}
     for playlist in link_array:
-        already_dld_songs = link_array[playlist].split(',')
-        playlist_link = playlist
+        already_dld_songs = playlist.split(',')
+        playlist_link = already_dld_songs[0]
         individual_new_songs_to_dl, playlist_id = get_new_songs_to_dl(playlist_link, already_dld_songs)
         if len(individual_new_songs_to_dl) == 0:
             print(f"No new songs to download for playlist link {playlist}")
