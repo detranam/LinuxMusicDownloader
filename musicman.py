@@ -1,6 +1,5 @@
 from sys import argv, platform
 from pathlib import Path
-from tinytag import TinyTag, TinyTagException
 from subprocess import run
 import os
 import shutil
