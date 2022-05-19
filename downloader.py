@@ -22,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OU
 IN THE SOFTWARE.
 """
 
-from tinytag import TinyTagException
 import musicman
 import argparse
 
@@ -44,10 +43,9 @@ group.add_argument(
 group.add_argument(
     "-j", "--json", help="The JSON file containing playlist link(s) to download from", type=str)
 args = parser.parse_args()
-try:
-    if args.text:
-        musicman.download_txt_songs(args.text.strip())
-    elif args.json:
-        musicman.download_playlist_songs(args.json)
-except TinyTagException as err:
-    print("ERROR: TinyTag threw an error: " + err)
+
+
+if args.text:
+    musicman.download_txt_songs(args.text.strip())
+elif args.json:
+    musicman.download_playlist_songs(args.json)
