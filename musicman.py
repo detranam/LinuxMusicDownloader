@@ -124,7 +124,50 @@ def get_new_songs_to_dl(playlist_link, already_downloaded_list):
 
 
     return new_song_ids,playlist_id
-    
+
+
+def download_playlist_atomic(path, starting_playlist_str):
+    """Downloads music from an array into a given path
+
+    Args:
+        path (path): The place to 'dump' the files when downloaded
+        playlist_likm (string): The playlist link to download
+    """
+
+    already_dld_songs = starting_playlist_str.split(',')
+    playlist_link = already_dld_songs[0]
+    individual_new_songs_to_dl, playlist_id = get_new_songs_to_dl(playlist_link, already_dld_songs)
+    if len(individual_new_songs_to_dl) == 0:
+        print(f"No new songs to download for playlist link {starting_playlist_str}")
+        return ""
+    print(f"Downloading {len(individual_new_songs_to_dl)} new songs from {playlist_link}")
+    for code in individual_new_songs_to_dl:
+        YDL_OPTIONS = {
+            'format': 'bestaudio',
+            'geo_bypass': True,
+            'restrictfilenames': True,
+            'ignoreerrors': True,
+            'min_views': 1500,
+            'default_search': 'ytsearch',
+            'ffmpeg_location': 'C:\\ffmpeg\\bin',
+            'playlist_random': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            },
+                {
+                'key': 'FFmpegMetadata'
+            }],
+            'outtmpl': f'{path}\\'+ f"{playlist_id}\\"  +'%(title)s.%(ext)s'
+        }
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            ydl.download("https://www.youtube.com/watch?v=" + code)#playlist_link)
+    #now that we've downloaded all the codes, we should update the playlist link by appending all the new song codes we just downloaded
+    updated_codes = ','.join(already_dld_songs + individual_new_songs_to_dl)
+    return updated_codes
+    #now that we finished downloading all our songs, return the new and edited link_array in order for state to be saved.
+    return ret_dict
 
 def download_playlist_links(path, link_array):
     """Downloads music from an array into a given path

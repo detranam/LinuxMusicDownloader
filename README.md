@@ -12,6 +12,8 @@ This app expects you to have the correct youtube-dl installed along with the nec
 - [ ] Some sort of tracking system to know what has already been downloaded or not
 - [ ] Potentially a precision size checker to find what songs are identical and remove duplicates
 - [ ] Multithreading (if useful)
+- [ ] Add logging to allow for cross-application debugging
+- [ ] Made the actual 'download' method thread safe and asynchronous to allow higher-level applications to continue work
 
 # How To Use
 
