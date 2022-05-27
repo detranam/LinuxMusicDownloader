@@ -1,11 +1,11 @@
 from sys import argv, platform
 from pathlib import Path
-from subprocess import run
+import subprocess
 import os
 import shutil
 import json
 from yt_dlp import YoutubeDL
-
+import logging
 
 music_dict = {}
 
@@ -67,6 +67,9 @@ def download_playlist_songs(json_name):
     with open(json_name, 'r') as json_file:
         playlists = json.load(json_file)['playlists']
         for playlist in playlists:
+            #paste this back in if failures
+            #                'ffmpeg_location': 'C:\\ffmpeg\\bin',
+
             print(f"Downloading songs from {playlist}")
             YDL_OPTIONS = {
                 'format': 'bestaudio',
@@ -74,8 +77,8 @@ def download_playlist_songs(json_name):
                 'restrictfilenames': True,
                 'ignoreerrors': True,
                 'min_views': 1500,
+                'ffmpeg_location': 'bin',
                 'default_search': 'ytsearch',
-                'ffmpeg_location': 'C:\\ffmpeg\\bin',
                 'playlist_random': True,
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
@@ -92,7 +95,11 @@ def download_playlist_songs(json_name):
 
 
 def get_new_songs_to_dl(playlist_link, already_downloaded_list):
-    output = run(f"yt-dlp.exe -s {playlist_link}", capture_output=True).stdout.decode('utf-8')
+    try:
+        output = subprocess.check_output(["yt-dlp","-s", f"{playlist_link}"], stderr=subprocess.STDOUT).decode('utf-8') #.exe
+    except subprocess.CalledProcessError as er:
+        logging.error(f"Download from playlist failed, likely an incorrect song. RETURN CODE:{er.returncode}")
+        output = er.output.decode('utf-8')
     splitlines = output.split("\n")
     useful_lines = []
     playlist_id = ""
@@ -138,7 +145,7 @@ def download_playlist_atomic(path, starting_playlist_str):
     playlist_link = already_dld_songs[0]
     individual_new_songs_to_dl, playlist_id = get_new_songs_to_dl(playlist_link, already_dld_songs)
     if len(individual_new_songs_to_dl) == 0:
-        print(f"No new songs to download for playlist link {starting_playlist_str}")
+        print(f"No new songs to download for playlist link {playlist_link}")
         return ""
     print(f"Downloading {len(individual_new_songs_to_dl)} new songs from {playlist_link}")
     for code in individual_new_songs_to_dl:
@@ -149,7 +156,7 @@ def download_playlist_atomic(path, starting_playlist_str):
             'ignoreerrors': True,
             'min_views': 1500,
             'default_search': 'ytsearch',
-            'ffmpeg_location': 'C:\\ffmpeg\\bin',
+            'ffmpeg_location': 'bin',
             'playlist_random': True,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -159,7 +166,7 @@ def download_playlist_atomic(path, starting_playlist_str):
                 {
                 'key': 'FFmpegMetadata'
             }],
-            'outtmpl': f'{path}\\'+ f"{playlist_id}\\"  +'%(title)s.%(ext)s'
+            'outtmpl': f'{path}/'+ f"{playlist_id}/"  +'%(title)s.%(ext)s'
         }
         with YoutubeDL(YDL_OPTIONS) as ydl:
             ydl.download("https://www.youtube.com/watch?v=" + code)#playlist_link)
@@ -183,7 +190,7 @@ def download_playlist_links(path, link_array):
         playlist_link = already_dld_songs[0]
         individual_new_songs_to_dl, playlist_id = get_new_songs_to_dl(playlist_link, already_dld_songs)
         if len(individual_new_songs_to_dl) == 0:
-            print(f"No new songs to download for playlist link {playlist}")
+            print(f"No new songs to download for playlist link {playlist_link}")
             continue
         print(f"Downloading {len(individual_new_songs_to_dl)} new songs from {playlist_link}")
         for code in individual_new_songs_to_dl:
@@ -194,7 +201,7 @@ def download_playlist_links(path, link_array):
                 'ignoreerrors': True,
                 'min_views': 1500,
                 'default_search': 'ytsearch',
-                'ffmpeg_location': 'C:\\ffmpeg\\bin',
+                'ffmpeg_location': 'bin',
                 'playlist_random': True,
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
@@ -230,7 +237,7 @@ def download_txt_songs(filename):
             'ignoreerrors': True,
             'min_views': 1500,
             'default_search': 'ytsearch',
-            'ffmpeg_location': 'C:\\ffmpeg\\bin',
+            'ffmpeg_location': 'bin',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
